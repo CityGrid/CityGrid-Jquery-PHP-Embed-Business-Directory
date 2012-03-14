@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>CityGrid Directory</title>
+</head>
+<body>
+
+<!-- Begin CityGrid Embed Widget--->
+<!--JQuery-->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
+<!--CityGrid Ads-->
+<script type="text/javascript" src="http://static.citygridmedia.com/ads/scripts/v2/loader.js"></script>
+<!--Popup Box-->
+<script type="text/javascript" src="http://embed-business-directory.hyp3rl0cal.com/thickbox.js"></script>
+
+<!--Some Styling, download locally if you want to change-->
+<link rel="stylesheet" href="http://embed-business-directory.hyp3rl0cal.com/bootstrap.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="http://embed-business-directory.hyp3rl0cal.com/thickbox.css" type="text/css" media="screen" />
+
+<script type="text/javascript">
+//  Settings that you can change.  Will add more in the future.
+$root = 'http://embed-business-directory.hyp3rl0cal.com/search.php';
+$count = "20"; // How many businesses you want to show
+$width = "500"; // How wide you want your listing
+$showimages = 1; // Whether you want to show images.  Will exclude places that don't have a default image (0 or 1)
+$showtagline = 1; // Sometimes the tagline can be long, so you can turn off (0 or 1)
+$where = 'austin,tx';  // Change to whatever where you want
+$what = 'bbq'; //  Change to whatever keyword you want
+$url = $root + '?jsoncallback=?&where=' + $where + '&what=' + $what + '&rpp=' + $count;
+//document.write('<a href="' + $url + '">link</a>');
+
+jQuery.getJSON($url, function(data) {
+
+	if(data.auth == null) {
+		
+		firsthit = data.first_hit;
+		lasthit = data.last_hit;
+		totalhits = data.total_hits;
+		page = data.page;
+		rpp = data.rpp;  
+		
+	    var $wrap = $('<div>').attr('id', 'citylocations');
+	    var $tbl = $('<table cellpadding="5" cellspacing="5" align="center" class="zebra-striped" style="width: ' + $width + 'px;">').attr('id', 'citylocationtable');	
+		
+		$.each(data.results.locations, function(index) {
+			
+	        //alert(data.results.locations[index].name);
+			var $id = data.results.locations[index].id;
+			var $public_id = data.results.locations[index].public_id;
+			var $type = data.results.locations[index].type;
+			var $listingId = data.results.locations[index].listingId;
+			var $name = data.results.locations[index].name;
+			var $street = data.results.locations[index].address.street;
+			var $city = data.results.locations[index].address.city;
+			var $state = data.results.locations[index].address.state;
+			var $zip = data.results.locations[index].address.postal_code;
+			var $latitude = data.results.locations[index].latitude;
+			var $longitude = data.results.locations[index].longitude;
+			var $phone = data.results.locations[index].phone;
+			var $tagline = data.results.locations[index].tagline;
+			var $description = data.results.locations[index].description;
+			var $net_ppe = data.results.locations[index].net_ppe;
+			var $reviews = data.results.locations[index].reviews;
+			var $offers = data.results.locations[index].offers;
+			var $distance = data.results.locations[index].distance;
+			var $overallReviewRating = data.results.locations[index].overallReviewRating;
+			var $adDestinationUrl = data.results.locations[index].adDestinationUrl;
+			var $adImageUrl = data.results.locations[index].image;	 
+			
+			// Check if it has an image
+			if($adImageUrl == null) {$hasImage=0;} else {$hasImage=1;}
+	        if($hasImage==0&&$showimages==1){$show=0;}else if($hasImage==1&&$showimages==0){$show=1;}else if($hasImage==1&&$showimages==1){$show=1;}else{$show=0;}
+	       	 
+	        if($show==1) {
+	        	
+	        var $rw = $('<tr>');
+	        var $cell = $('<td align="left">');
+	        
+	        //Image
+	        if($showimages==1) {
+	        if($adImageUrl)
+	        	{
+	        	$cell.append('<a href="http://embed-business-directory.hyp3rl0cal.com/detail.php?id=' + $public_id + '&where=' + $where + '&what=' + $what + '&keepThis=true&TB_iframe=true&height=500&width=700" class="thickbox"><img src="' + $adImageUrl + '" width="75" align="left" style="padding: 5px;" /></a>');
+	        	}
+	        }
+	        // Name
+			$cell.append('<a href="http://embed-business-directory.hyp3rl0cal.com/detail.php?id=' + $public_id + '&where=' + $where + '&what=' + $what + '&keepThis=true&TB_iframe=true&height=500&width=700" class="thickbox"><strong>' + $name + '</strong><br /></a>');
+	        if($description){ $cell.append($description + '<br />'); }				
+	        if($showtagline==1) { if($tagline){ $cell.append($tagline + '<br />'); }}
+	        if($street){ $cell.append($street + ' '); }
+	        if($city){ $cell.append($city + ' ');}	 
+	        if($state){ $cell.append($state + ' '); }
+	        if($zip){ $cell.append($zip + ' '); }	            	
+	        $rw.append($cell);
+	        $tbl.append($rw);         
+	        }       
+	    });	
+		        
+		$wrap.append($tbl);   	        
+		$('div.citygrid-directory').html($wrap);
+		tb_init('a.thickbox');	   
+		
+		}
+	else
+		{
+		var $wrap = $('<div>');
+		
+		var $form = $('<form action="' + $root + '" method="post">');
+		
+		$form.append('<p>Your domain is not authorized to use this widget!</p>');
+		
+		$form.append('<p>Please enter your <a href="http://developer.citygridmedia.com/dashboard/registration" target="_blank">CityGrid Publisher Code</a></p>');
+		
+		$form.append('<input type="text" size="25" name="pubcode" value="" /><input type="submit" value="go" />');
+		
+		$wrap.append($form);
+		
+		$('div.citygrid-directory').html($wrap);
+		}
+});
+</script>
+<div class="citygrid-directory" align="center"></div>
+<!--End CityGrid Embed Widget--->	
+
+</body>
+</html>
